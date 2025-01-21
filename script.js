@@ -1,71 +1,58 @@
-    let audioContext;
-    let microphone;
-    let audioProcessor;
-    let stream;
+let audioContext;
+let microphone;
+let source;
+let stream;
 
-    const startButton = document.getElementById('start');
-    const stopButton = document.getElementById('stop');
-    const statusText = document.getElementById('status');
+const startButton = document.getElementById('start');
+const stopButton = document.getElementById('stop');
+const statusText = document.getElementById('status');
 
-    // Start Audio Capture
-    async function startAudio() {
-      try {
-        // Zugriff auf das Mikrofon mit spezifischen Einstellungen
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            sampleRate: 48000, // Höhere Sample-Rate für bessere Qualität
-            channelCount: 1,  // Mono-Input
-            echoCancellation: false, // Bessere Rohdaten
-            noiseSuppression: false, // Kein Rauschfilter
-            autoGainControl: false  // Keine automatische Lautstärkeanpassung
-          }
-        });
+async function startAudio() {
+  try {
+    if (!audioContext) {
+      // AudioContext nur einmal erstellen
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
 
-        audioContext = new (window.AudioContext || window.webkitAudioContext)({
-          sampleRate: 48000 // Gleiche Sample-Rate wie das Mikrofon
-        });
-
-        microphone = audioContext.createMediaStreamSource(stream);
-
-        // Audio-Prozessor mit kleinerer Puffergröße für Echtzeit
-        audioProcessor = audioContext.createScriptProcessor(512, 1, 1);
-        audioProcessor.onaudioprocess = (audioEvent) => {
-          const inputData = audioEvent.inputBuffer.getChannelData(0);
-          const outputData = audioEvent.outputBuffer.getChannelData(0);
-
-          // Direkte Kopie der Eingangsdaten in die Ausgangsdaten
-          for (let i = 0; i < inputData.length; i++) {
-            outputData[i] = inputData[i];
-          }
-        };
-
-        // Verbinden der Audio-Knoten
-        microphone.connect(audioProcessor);
-        audioProcessor.connect(audioContext.destination);
-
-        // UI-Updates
-        statusText.textContent = "Status: Aufnahme läuft";
-        startButton.disabled = true;
-        stopButton.disabled = false;
-      } catch (error) {
-        console.error('Fehler beim Zugriff auf das Mikrofon:', error);
-        alert('Bitte erlaube den Zugriff auf das Mikrofon und versuche es erneut.');
+    // Mikrofonzugriff anfordern
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        sampleRate: 48000,
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
       }
+    });
+
+    // Quelle nur erstellen, wenn sie noch nicht existiert
+    if (!source) {
+      source = audioContext.createMediaStreamSource(stream);
     }
 
-    // Stop Audio Capture
-    function stopAudio() {
-      if (microphone) microphone.disconnect();
-      if (audioProcessor) audioProcessor.disconnect();
-      if (stream) stream.getTracks().forEach(track => track.stop());
-      if (audioContext) audioContext.close();
+    // Mikrofon direkt mit Lautsprecher verbinden
+    source.connect(audioContext.destination);
 
-      // UI-Updates
-      statusText.textContent = "Status: Aufnahme gestoppt";
-      startButton.disabled = false;
-      stopButton.disabled = true;
-    }
+    // Status und Buttons aktualisieren
+    statusText.textContent = "Status: Aufnahme läuft (du solltest dich hören)";
+    startButton.disabled = true;
+    stopButton.disabled = false;
+  } catch (error) {
+    console.error("Fehler beim Zugriff auf das Mikrofon:", error);
+    alert("Ihr sollt das Mikro anmachen 🙄😒");
+  }
+}
 
-    // Event-Listener für Buttons
-    startButton.addEventListener('click', startAudio);
-    stopButton.addEventListener('click', stopAudio);
+function stopAudio() {
+  // Verbindung zwischen Mikrofon und Lautsprecher trennen
+  if (source) {
+    source.disconnect(audioContext.destination);
+  }
+
+  // Status und Buttons aktualisieren
+  statusText.textContent = "Status: Aufnahme gestoppt";
+  startButton.disabled = false;
+  stopButton.disabled = true;
+}
+
+startButton.addEventListener("click", startAudio);
+stopButton.addEventListener("click", stopAudio);
