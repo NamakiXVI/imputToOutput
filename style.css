@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    margin: 50px;
+    background-color: bisque;
   }
   button {
     padding: 15px 25px;
@@ -11,4 +11,37 @@ body {
   }
   p {
     font-size: 18px;
+  }
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.label {
+    color: black;
+    text-decoration: none;
+    font-size: 25px;
+    border: none;
+    background: none;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .label::before {
+    margin-left: auto;
+  }
+  
+  .label::after, .label::before {
+    content: '';
+    width: 0%;
+    height: 2px;
+    background: #f44336;
+    display: block;
+    transition: 0.5s;
+  }
+  
+  .label:hover::after, .label:hover::before {
+    width: 100%;
   }
