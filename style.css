@@ -1,32 +1,42 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Protest Strike", serif;
+    font-weight: 400;
+    font-style: normal;
     text-align: center;
-    background-color: bisque;
+    background-color: #212121;
   }
   button {
     padding: 15px 25px;
     font-size: 16px;
     cursor: pointer;
-    margin: 20px;
+    margin: 10% 0%; 
   }
+
   p {
-    font-size: 18px;
+    font-size: 4vw; 
+    margin: 10px 20px;
+    color: white;
   }
 
 .buttons {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
 }
 
 .label {
-    color: black;
+    color: white;
     text-decoration: none;
-    font-size: 25px;
     border: none;
     background: none;
-    font-weight: 600;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Protest Strike", serif;
+    font-weight: 400;
+    font-style:normal;
+    font-size: 10vw;
+    text-shadow: #000;
   }
   
   .label::before {
@@ -44,4 +54,46 @@ body {
   
   .label:hover::after, .label:hover::before {
     width: 100%;
+  }
+
+.button-click {
+    color: #fff;
+    padding: 0.7em 1.7em;
+    font-size: 5vw;
+    border-radius: 0.5em;
+    background: #212121;
+    cursor: pointer;
+    border: 1px solid #212121;
+    transition: all 0.3s;
+    box-shadow:
+      6px 6px 12px #0a0a0a,
+      -6px -6px 12px #2f2f2f;
+  }
+  
+  .button-click:active {
+    color: #666;
+    box-shadow:
+      0px 0px 0px #000,
+      0px 0px 0px #2f2f2f,
+      inset 4px 4px 12px #1a1a1a,
+      inset -4px -4px 12px #1f1f1f;
+  }
+
+  .button-click:disabled{
+    color: #212121;
+    padding: 0.7em 1.7em;
+    font-size: 18px;
+    border-radius: 0.5em;
+    background: #494949;
+    cursor: pointer;
+    border: 1px solid #212121;
+    transition: all 0.3s;
+    box-shadow:
+      6px 6px 12px #0a0a0a,
+      -6px -6px 12px #2f2f2f;
+  }
+  
+  .container{
+    width: 100%;
+    height: 100%;
   }

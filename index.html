@@ -2,16 +2,18 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" user-scalable=0>
   <title>Realtime record play</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Protest+Strike&family=VT323&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="container">
   <button class="label">Input to Audio fixed</button>
-  <p>diese website nimmt deine Stimme auf und spielt sie ab</p>
   <div class="buttons">
-      <button id="start">Start</button>
-      <button id="stop" disabled>Stop</button>
+    <button class="button-click" id="start">Start</button>
+    <button class="button-click" id="stop" disabled>Stop</button>
   </div>
   <p id="status">Status: Bereit</p>
   <script src="script.js"></script>
