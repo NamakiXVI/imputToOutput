@@ -1,7 +1,7 @@
 let audioContext;
 let microphone;
-let source;
 let stream;
+let audioProcessor;
 
 const startButton = document.getElementById('start');
 const stopButton = document.getElementById('stop');
@@ -11,7 +11,10 @@ async function startAudio() {
   try {
     if (!audioContext) {
       // AudioContext nur einmal erstellen
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        latencyHint: "interactive", // Latenz optimieren
+        sampleRate: 48000 // Standard-Sample-Rate
+      });
     }
 
     // Mikrofonzugriff anfordern
@@ -24,13 +27,22 @@ async function startAudio() {
       }
     });
 
-    // Quelle nur erstellen, wenn sie noch nicht existiert
-    if (!source) {
-      source = audioContext.createMediaStreamSource(stream);
-    }
+    // Audioquelle erstellen
+    microphone = audioContext.createMediaStreamSource(stream);
 
-    // Mikrofon direkt mit Lautsprecher verbinden
-    source.connect(audioContext.destination);
+    // ScriptProcessor verwenden, um Daten direkt zu verarbeiten
+    audioProcessor = audioContext.createScriptProcessor(256, 1, 1); // Kleine Puffergröße (256)
+    audioProcessor.onaudioprocess = (audioEvent) => {
+      const inputData = audioEvent.inputBuffer.getChannelData(0);
+      const outputData = audioEvent.outputBuffer.getChannelData(0);
+      for (let i = 0; i < inputData.length; i++) {
+        outputData[i] = inputData[i]; // Kopiert die Daten direkt
+      }
+    };
+
+    // Verbindung herstellen
+    microphone.connect(audioProcessor);
+    audioProcessor.connect(audioContext.destination);
 
     // Status und Buttons aktualisieren
     statusText.textContent = "Status: Aufnahme läuft (du solltest dich hören)";
@@ -38,15 +50,15 @@ async function startAudio() {
     stopButton.disabled = false;
   } catch (error) {
     console.error("Fehler beim Zugriff auf das Mikrofon:", error);
-    alert("Ihr sollt das Mikro anmachen 🙄😒");
+    alert("Ihr sollt Mikro anmachen 🙄");
   }
 }
 
 function stopAudio() {
-  // Verbindung zwischen Mikrofon und Lautsprecher trennen
-  if (source) {
-    source.disconnect(audioContext.destination);
-  }
+  // Verbindung und Ressourcen freigeben
+  if (microphone) microphone.disconnect();
+  if (audioProcessor) audioProcessor.disconnect();
+  if (stream) stream.getTracks().forEach(track => track.stop());
 
   // Status und Buttons aktualisieren
   statusText.textContent = "Status: Aufnahme gestoppt";
